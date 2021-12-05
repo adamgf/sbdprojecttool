@@ -112,11 +112,9 @@ class App extends React.Component {
 
     const updatePeopleState = (peopleThumbnails) => {
       const existingthumbnails = this.state.peoplethumbnails
-      alert('about to set peoplethumbnails 1: ' + peopleThumbnails.length + ' : ' + existingthumbnails.length)
-      if (peopleThumbnails && peopleThumbnails.length > 0) {
+		if (peopleThumbnails && peopleThumbnails.length > 0) {
         var newimagethumbnails = existingthumbnails.concat(peopleThumbnails)
 		newimagethumbnails.sort((a, b) => (a.tags[0].value > b.tags[0].value) ? 1 : -1)
-		alert('about to set peoplethumbnails ' + newimagethumbnails.length)
         this.setState({ peoplethumbnails : newimagethumbnails })
       }
     }
@@ -148,40 +146,51 @@ class App extends React.Component {
 		  var representationalImages = []
 		  var numProcessed = 0
 		  for (const personId of VIPs) {
-            theResult.get(`https://3.basecampapi.com/${userId}/people/${personId}.json`, {
-			  headers: {
-			  	'User-Agent' : userAgentStr,
-				'Content-Type' : 'application/json'
-			  }
-		    })
-            .done(function(person) {
-			  const autoSelectIndex = autoSelected.indexOf(person.id)
-			  const selectEm = (autoSelectIndex !== -1)
-			  if (selectEm) {
-				targetPeopleIDs.push(person.id)
-			  }
-			  const representationalImage = {
-                src: person.avatar_url,
-                thumbnail: person.avatar_url,
-                thumbnailWidth: 64,
-                thumbnailHeight: 64,
-                isSelected: selectEm,
-                caption: person.name,
-                tags: [{ value: person.id, title: person.name }]
-              }
-			  representationalImages.push(representationalImage)
+			const repImage = JSON.parse(window.localStorage.getItem(`person_${personId}`))
+			if (repImage !== null) {
+			  representationalImages.push(repImage)
 			  numProcessed += 1
 			  if (numProcessed === VIPs.length) {
 		        updatePeopleState(representationalImages)         
 			  }
-            })
-            .fail(function(err) {
-			  numProcessed += 1
-  			  if (numProcessed === VIPs.length) {
-  		        updatePeopleState(representationalImages)         
-  			  }
-              alert('Failed to get person with id: ' + personId + ' err: ' + JSON.stringify(err)) 
-            })   
+			}
+			else {
+              theResult.get(`https://3.basecampapi.com/${userId}/people/${personId}.json`, {
+			    headers: {
+			  	  'User-Agent' : userAgentStr,
+				  'Content-Type' : 'application/json'
+			    }
+		      })
+              .done(function(person) {
+			    const autoSelectIndex = autoSelected.indexOf(person.id)
+			    const selectEm = (autoSelectIndex !== -1)
+			    if (selectEm) {
+				  targetPeopleIDs.push(person.id)
+			    }
+			    const representationalImage = {
+                  src: person.avatar_url,
+                  thumbnail: person.avatar_url,
+                  thumbnailWidth: 64,
+                  thumbnailHeight: 64,
+                  isSelected: selectEm,
+                  caption: person.name,
+                  tags: [{ value: person.id, title: person.name }]
+                }
+				window.localStorage.setItem(`person_${personId}`, JSON.stringify(representationalImage))
+			    representationalImages.push(representationalImage)
+			    numProcessed += 1
+			    if (numProcessed === VIPs.length) {
+		          updatePeopleState(representationalImages)         
+			    }
+              })
+              .fail(function(err) {
+			    numProcessed += 1
+  			    if (numProcessed === VIPs.length) {
+  		          updatePeopleState(representationalImages)         
+  			    }
+                alert('Failed to get person with id: ' + personId + ' err: ' + JSON.stringify(err)) 
+              })
+			}   
 		  }
 		  
         }
@@ -189,29 +198,39 @@ class App extends React.Component {
         getPeopleFunc(result) 
 
         const getProjectsFunc = async(theResult, projectspage) => {
-          theResult.get(`https://3.basecampapi.com/${userId}/projects.json?page=${projectspage}`, {
-  		    headers: {
-			  "User-Agent" : userAgentStr,
-  			  "Content-Type" : "application/json"
-  			}
-		  })
-          .done(function(projectslist) {
-            var projectsOptions = []
-            for (const project of projectslist) {
-			  const projectSelectOption = {
+		  const projects = JSON.parse(window.localStorage.getItem(`projects_${projectspage}`))
+	      /* alert('projects is: ' + JSON.stringify(projects))
+		  if (projects != null) {
+		    updateProjectState(projects)
+			getProjectsFunc(theResult, projectspage + 1)
+		  }
+		  else { */
+            theResult.get(`https://3.basecampapi.com/${userId}/projects.json?page=${projectspage}`, {
+			  cache: true,
+  		      headers: {
+			    "User-Agent" : userAgentStr,
+  			    "Content-Type" : "application/json"
+  			  }
+		    })
+            .done(function(projectslist) {
+              var projectsOptions = []
+              for (const project of projectslist) {
+			    const projectSelectOption = {
 				  value: project.id,
 				  label: project.name		
-			  }	
-			  projectsOptions.push(projectSelectOption)
-            }
-            if (projectsOptions.length > 0) {
-              updateProjectState(projectsOptions)
-              getProjectsFunc(result, projectspage + 1)
-            }
-          })
-          .fail(function(err) {
-            alert('Failed to get projects: ' + JSON.stringify(err)) 
-          })            
+			    }	
+			    projectsOptions.push(projectSelectOption)
+              }
+              if (projectsOptions.length > 0) {
+				//window.localStorage.setItem(`projects_${projectspage}`, JSON.stringify(projectsOptions))
+                updateProjectState(projectsOptions)
+                getProjectsFunc(result, projectspage + 1)
+              }
+            })
+            .fail(function(err) {
+              alert('Failed to get projects for page: ' + projectspage + ' err: ' + JSON.stringify(err)) 
+            })
+		  //}            
         }
 
         getProjectsFunc(result, 1)
