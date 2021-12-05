@@ -198,8 +198,7 @@ class App extends React.Component {
         getPeopleFunc(result) 
 
         const getProjectsFunc = async(theResult, projectspage) => {
-		  const projects = JSON.parse(window.localStorage.getItem(`projects_${projectspage}`))
-	      /* alert('projects is: ' + JSON.stringify(projects))
+	      /* 
 		  if (projects != null) {
 		    updateProjectState(projects)
 			getProjectsFunc(theResult, projectspage + 1)
@@ -222,13 +221,27 @@ class App extends React.Component {
 			    projectsOptions.push(projectSelectOption)
               }
               if (projectsOptions.length > 0) {
-				//window.localStorage.setItem(`projects_${projectspage}`, JSON.stringify(projectsOptions))
+				window.localStorage.setItem(`projects_${projectspage}`, JSON.stringify(projectsOptions))
                 updateProjectState(projectsOptions)
                 getProjectsFunc(result, projectspage + 1)
               }
+			  else {
+			  	window.localStorage.setItem(`projects_${projectspage}`, JSON.stringify([]))
+			  }
+			  	
+			  
             })
             .fail(function(err) {
-              alert('Failed to get projects for page: ' + projectspage + ' err: ' + JSON.stringify(err)) 
+		      const projects = JSON.parse(window.localStorage.getItem(`projects_${projectspage}`))
+	  		  if (projects != null) {
+				if (projects.length > 0) {
+	  		      updateProjectState(projects)
+	  			  getProjectsFunc(theResult, projectspage + 1)
+				}
+	  		  }
+			  else {
+                alert('Failed to get projects for page: ' + projectspage + ' err: ' + JSON.stringify(err)) 
+			  }
             })
 		  //}            
         }
