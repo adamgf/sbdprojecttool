@@ -5,6 +5,8 @@ import { OAuth } from 'oauthio-web';
 import Gallery from 'react-grid-gallery';
 import Select from 'react-select';
 
+const userAgentStr = 'SBDProjectTool (adamgf@gmail.com)'
+
 const VIPs = [
 	12921371, 
 	12964335, 
@@ -128,7 +130,7 @@ class App extends React.Component {
     }
 
     OAuth.initialize('HbYXKGPIU3ilvj5XZmgy7PKvUGg')
-    OAuth.popup('basecamp')
+  	OAuth.popup('basecamp', { cache : true, headers: { 'User-Agent' : userAgentStr, 'Content-Type' : 'application/json' } })
 	.done(function(result) {
       result.me().done(function(data) {
 
@@ -146,7 +148,12 @@ class App extends React.Component {
 		  var representationalImages = []
 		  var numProcessed = 0
 		  for (const personId of VIPs) {
-            theResult.get(`https://3.basecampapi.com/${userId}/people/${personId}.json`)
+            theResult.get(`https://3.basecampapi.com/${userId}/people/${personId}.json`, {
+			  headers: {
+			  	'User-Agent' : userAgentStr,
+				'Content-Type' : 'application/json'
+			  }
+		    })
             .done(function(person) {
 			  const autoSelectIndex = autoSelected.indexOf(person.id)
 			  const selectEm = (autoSelectIndex !== -1)
@@ -182,7 +189,12 @@ class App extends React.Component {
         getPeopleFunc(result) 
 
         const getProjectsFunc = async(theResult, projectspage) => {
-          theResult.get(`https://3.basecampapi.com/${userId}/projects.json?page=${projectspage}`)
+          theResult.get(`https://3.basecampapi.com/${userId}/projects.json?page=${projectspage}`, {
+  		    headers: {
+			  "User-Agent" : userAgentStr,
+  			  "Content-Type" : "application/json"
+  			}
+		  })
           .done(function(projectslist) {
             var projectsOptions = []
             for (const project of projectslist) {
@@ -217,7 +229,7 @@ class App extends React.Component {
   	}
   	else {
       OAuth.initialize('HbYXKGPIU3ilvj5XZmgy7PKvUGg')
-  	  OAuth.popup('basecamp')
+  	  OAuth.popup('basecamp', { cache : true, headers: { 'User-Agent' : userAgentStr, 'Content-Type' : 'application/json' } })
   	  .done(function(result) {
   	    result.me().done(function(data) {
 
@@ -236,6 +248,7 @@ class App extends React.Component {
           for (const projectId of targetProjectIDs) {
   		    result.put(`https://3.basecampapi.com/${userId}/projects/${projectId}/people/users.json`, {
   			  headers: {
+				"User-Agent" : userAgentStr,
   			    "Content-Type" : "application/json"
   			  },
   		      data: putData
