@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/sbdprojecttool/static/css/main.5e19c3c9.chunk.css",
-    "main.js": "/sbdprojecttool/static/js/main.378df0fb.chunk.js",
-    "main.js.map": "/sbdprojecttool/static/js/main.378df0fb.chunk.js.map",
+    "main.js": "/sbdprojecttool/static/js/main.5f58b165.chunk.js",
+    "main.js.map": "/sbdprojecttool/static/js/main.5f58b165.chunk.js.map",
     "runtime-main.js": "/sbdprojecttool/static/js/runtime-main.6eb5e6c4.js",
     "runtime-main.js.map": "/sbdprojecttool/static/js/runtime-main.6eb5e6c4.js.map",
     "static/js/2.35f1aada.chunk.js": "/sbdprojecttool/static/js/2.35f1aada.chunk.js",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.6eb5e6c4.js",
     "static/js/2.35f1aada.chunk.js",
     "static/css/main.5e19c3c9.chunk.css",
-    "static/js/main.378df0fb.chunk.js"
+    "static/js/main.5f58b165.chunk.js"
   ]
 }
